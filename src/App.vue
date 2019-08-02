@@ -29,7 +29,7 @@ export default {
     "bc-content": content,
     "nav-side": navSide,
     "bc-footer": footer,
-    "loading": loading
+    loading: loading
   },
 
   data() {
@@ -86,7 +86,7 @@ export default {
     },
     // 注册
     verifyRegister(usr) {
-      const { loginname, password} = usr
+      const { loginname, password } = usr;
       this.$apiRequest.registerUsers(
         {
           loginname,
@@ -95,17 +95,27 @@ export default {
         res => {
           this.loading = false;
           this.$store.commit("changeLoginStatus", res.data);
+          this.$commonUtil.setCookie("loginname", loginname, 24);
+          this.$commonUtil.setCookie("password", password, 24);
         },
         err => {
           this.loading = false;
           // 重新加载一下登录组件
           this.$children[2].reload();
         }
-      )
+      );
     },
     // 登录
     verifyLogin(usr) {
-      const { loginname, password} = usr
+      let loginname, password;
+      if (!usr) {
+        loginname = this.$commonUtil.getCookie("loginname");
+        password = this.$commonUtil.getCookie("password");
+        this.$store.commit("openLoginCard", false);
+      } else {
+        loginname = usr.loginname;
+        password = usr.password;
+      }
       this.$apiRequest.verifyUsers(
         {
           loginname,
@@ -113,6 +123,10 @@ export default {
         },
         res => {
           this.loading = false;
+          if (usr) {
+            this.$commonUtil.setCookie("loginname", loginname, 0.5);
+            this.$commonUtil.setCookie("password", password, 0.5);
+          }
           this.$store.commit("changeLoginStatus", res.data);
         },
         err => {
@@ -120,7 +134,8 @@ export default {
             success: false
           });
           // 密码验证错误时清除错误的cookie存储
-          this.$commonUtil.removeCookie("email");
+          this.$commonUtil.removeCookie("loginname");
+          this.$commonUtil.removeCookie("password");
           this.$commonUtil.netErrorTips(err);
           this.loading = false;
           // 重新加载一下登录组件
@@ -131,11 +146,12 @@ export default {
   },
 
   created() {
-    // 验证是否有token存储
-    if (this.$commonUtil.getCookie("accesstoken")) {
+    this.$store.commit("openLoginCard", true);
+    // 验证是否有存储
+    if (this.$commonUtil.getCookie("loginname")) {
       sessionStorage["isAutoLogin"] = "true";
       this.loading = true;
-      this.verifyEmails();
+      this.verifyLogin();
     } else {
       this.$store.commit("openLoginCard", true);
     }

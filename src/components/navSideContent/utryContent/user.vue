@@ -12,15 +12,6 @@
           <i class="fa fa-user fa-fw"></i>
           <span> 用户名：{{ userInfo.loginname }}</span
           ><br />
-          <i class="fa fa-github fa-fw"></i>
-          <span>GitHub：</span>
-          <a
-            class="user-github"
-            :href="'https://github.com/' + userInfo.githubUsername"
-            target="_blank"
-            title="点击进入github"
-            >{{ userInfo.githubUsername }}</a
-          ><br />
           <i class="fa fa-clock-o fa-fw"></i>
           <span>注册时间：{{ userInfo.create_at.slice(0, 10) }}</span>
         </div>
@@ -155,21 +146,25 @@ export default {
       }
     },
     // 请求用户基本信息
-    getUserInfo: function (userName) {
-      this.$apiRequest.getUserInfo(userName, (res) => {
-        this.userInfo = res.data.data
-        this.loading = false
-        if (!this.userInfo.recent_topics.length) {
-          this.hasPublishTopic = false
+    getUserInfo(userName) {
+      this.$apiRequest.getUserInfo(
+        userName,
+        res => {
+          this.userInfo = res.data.data;
+          this.loading = false;
+          if (!this.userInfo.recent_topics.length) {
+            this.hasPublishTopic = false;
+          }
+        },
+        err => {
+          alert("用户信息请求失败");
+          this.$commonUtil.netErrorTips(err);
+          this.$router.push({ path: "/utryCommunity/utryjsTopics" });
         }
-      }, (err) => {
-        alert('用户信息请求失败')
-        this.$commonUtil.netErrorTips(err)
-        this.$router.push({path: '/cnodeCommunity/cnodejsTopics'})
-      })
+      );
     },
     // 请求用户收藏的文章
-    getUserCollectedTopicn(userName) {
+    getUserCollectedTopic(userName) {
       this.$apiRequest.getUserCollectedTopic(
         userName,
         res => {
@@ -180,7 +175,6 @@ export default {
           }
         },
         err => {
-          console.log("无法获取用户收藏");
           this.$commonUtil.netErrorTips(err);
           this.collectLoading = false;
         }
@@ -188,7 +182,7 @@ export default {
     },
     requestUserInfo(userName) {
       this.getUserInfo(userName);
-      // this.getUserCollectedTopic(userName);
+      this.getUserCollectedTopic(userName); // 查询用户收藏的文章
     }
   },
   computed: {

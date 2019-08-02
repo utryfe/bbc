@@ -26,7 +26,7 @@
         <div v-show="loginTabActive">
           请输入你的昵称<br />
           <input
-            placeholder="小草"
+            placeholder="借月色行凶"
             class="identityInfo"
             v-model.trim="userInfo.loginname"
             type="text"
@@ -111,10 +111,14 @@ export default {
   },
   methods: {
     loginTab() {
+      // 重置
+      this.userInfo = { loginname: "", password: "" };
       this.registerTabActive = false;
       this.loginTabActive = true;
     },
     registerTab() {
+      // 重置
+      this.userInfo = { loginname: "", password: "" };
       this.loginTabActive = false;
       this.registerTabActive = true;
     },
@@ -127,6 +131,7 @@ export default {
         alert("还有信息没有填哦");
       } else {
         this.loading = true;
+        sessionStorage["isAutoLogin"] = "false";
         this.$root.$children[0].verifyRegister(this.userInfo);
       }
     },
@@ -136,13 +141,6 @@ export default {
         alert("还有信息没有填哦");
       } else {
         this.loading = true;
-        if (this.storeToekn === true) {
-          // 勾选了10天免登陆选项(240小时)，执行setCookie方法
-          this.$commonUtil.setCookie("userInfo", this.userInfo, 240);
-        } else {
-          // 普通登陆则设定token在cookie中存储的时限为半小时
-          this.$commonUtil.setCookie("userInfo", this.userInfo, 0.5);
-        }
         sessionStorage["isAutoLogin"] = "false";
         this.$root.$children[0].verifyLogin(this.userInfo);
       }

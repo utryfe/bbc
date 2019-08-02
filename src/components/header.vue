@@ -116,8 +116,9 @@ export default {
               success: false
             });
             // 注销登录时如果有存储cookie则清除cookie
-            if (this.$commonUtil.getCookie("email")) {
-              this.$commonUtil.removeCookie("email");
+            if (this.$commonUtil.getCookie("loginname")) {
+              this.$commonUtil.removeCookie("loginname");
+              this.$commonUtil.removeCookie("password");
             }
             alert("您已注销登录");
           } else {

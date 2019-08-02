@@ -117,7 +117,7 @@ export default {
   },
   methods: {
     // 发布文章or修改文章(根据传入参数判断是发布文章还是修改文章)
-    publishTopic(publishType) {
+    publishTopic: function(publishType) {
       if (!(this.publishData.topicTag === "default_select")) {
         if (this.publishData.topicTitle) {
           // 正则验证，标题字数10~50字之间
@@ -135,12 +135,12 @@ export default {
                   this.subLoading = true;
                   // 给发布的文章内容末尾添加推广链接
                   if (
-                    !RegExp(/娇羞的CNode社区处女作客户端/).test(
+                    !RegExp(/娇羞的Utry社区处女作客户端/).test(
                       this.publishData.topicContent
                     )
                   ) {
                     this.newTopicContent = this.publishData.topicContent.concat(
-                      "\n\n由 [vue版CNode客户端](https://reviving-pain.github.io/dist/#/cnodeCommunity/cnodejsTopics) 独家发布"
+                      "\n\n由 [vue版Utry客户端](https://github.com/utryfe/bbc) 独家发布"
                     );
                   }
                   this.createTopic();
@@ -171,10 +171,10 @@ export default {
       }
     },
     // 新文章发布请求与相关逻辑
-    createTopic() {
+    createTopic: function() {
       this.$apiRequest.createTopic(
         {
-          accesstoken: this.$commonUtil.getCookie("accesstoken"),
+          loginname: this.$commonUtil.getCookie("loginname"),
           title: this.publishData.topicTitle,
           tab: this.publishData.topicTag,
           content: this.newTopicContent
@@ -183,7 +183,7 @@ export default {
           this.subLoading = false;
           if (confirm("发布成功，需要查看刚发布的文章吗？")) {
             this.$router.push({
-              path: "/cnodeCommunity/cnodejsTopics/" + res.data.topic_id
+              path: "/utryCommunity/utryjsTopics/" + res.data.topic_id
             });
           } else {
             // 重新加载该子组件，清空填入内容
@@ -197,27 +197,29 @@ export default {
       );
     },
     // 修改好的文章提交请求与相关逻辑
-    modifyTopic() {
+    modifyTopic: function() {
       var topicId = this.$route.path.split("/").pop();
       this.$apiRequest.modifyTopic(
         {
-          accesstoken: this.$commonUtil.getCookie("accesstoken"),
+          loginname: this.$commonUtil.getCookie("loginname"),
           topic_id: topicId,
           title: this.publishData.topicTitle,
           tab: this.publishData.topicTag,
           content: this.publishData.topicContent
         },
         res => {
+          console.log(res);
           this.subLoading = false;
           this.$parent.$parent.reload();
         },
         err => {
+          console.log(err);
           this.$commonUtil.netErrorTips(err);
           this.subLoading = false;
         }
       );
     },
-    switchCard(type) {
+    switchCard: function(type) {
       if (type === "edit") {
         this.isPreview = false;
       } else if (type === "preview") {
@@ -225,10 +227,10 @@ export default {
       }
     }
   },
-  created() {
+  created: function() {
     // 更改页面标题
     if (this.$route.path.split("/").pop() === "createTopic") {
-      this.$commonUtil.exchangePageTitle("在CnodeJS社区发布话题");
+      this.$commonUtil.exchangePageTitle("在utry前端社区发布话题");
     }
     // 判断组件使用区域，回填表单，替换提交按钮
     if (this.topicTag) {
@@ -319,7 +321,7 @@ export default {
   border-radius: 5px;
   box-sizing: border-box;
   font-size: 1.1rem;
-  font-family: "微软雅黑";
+  font-family: "微软雅黑", serif;
   outline: none;
   resize: none;
 }

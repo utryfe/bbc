@@ -155,7 +155,7 @@
               :source="
                 comment.content.replace(
                   '(/user/',
-                  '(' + currentUrlPrefix + 'cnodeCommunity/user/'
+                  '(' + currentUrlPrefix + 'utryCommunity/user/'
                 )
               "
               class="md-content commentContent"
@@ -219,7 +219,7 @@
 </template>
 
 <script>
-import { topicTags, topicDetail } from "../../../data/topicClassify.js";
+import { topicTags } from "../../../data/topicClassify.js";
 import vueMarkdown from "vue-markdown";
 import loading from "../../common/loading.vue";
 import editTopic from "./createTopic.vue";
@@ -263,7 +263,7 @@ export default {
   },
   methods: {
     // 给评论点赞与取消点赞
-    likeController(replyIndex) {
+    likeController: function(replyIndex) {
       var replyId = this.article.replies[replyIndex].id;
       if (!this.loginStatus) {
         alert("需要登录");
@@ -297,7 +297,7 @@ export default {
       }
     },
     // 文章添加收藏与取消收藏
-    collectController() {
+    collectController: function() {
       var articleId = this.$route.path.split("/")[3];
       // 判断当前是否登录
       if (this.loginStatus) {
@@ -307,7 +307,7 @@ export default {
           // 文章取消收藏
           this.$apiRequest.deCollectTopic(
             {
-              accesstoken: this.$commonUtil.getCookie("accesstoken"),
+              loginname: this.$commonUtil.getCookie("loginname"),
               topic_id: articleId
             },
             res => {
@@ -326,7 +326,7 @@ export default {
           // 文章添加收藏
           this.$apiRequest.collectTopic(
             {
-              accesstoken: this.$commonUtil.getCookie("accesstoken"),
+              loginname: this.$commonUtil.getCookie("loginname"),
               topic_id: articleId
             },
             res => {
@@ -347,7 +347,7 @@ export default {
       }
     },
     // 发表评论
-    publishComment(e) {
+    publishComment: function(e) {
       // enter+ctrl组合键 或者 点击发表评论按钮
       if ((e.code === "Enter" && e.ctrlKey === true) || !e.code) {
         if (this.commentContent === "") {
@@ -361,7 +361,7 @@ export default {
           );
           // 给评论末尾添加推广链接
           this.newCommentContent = this.commentContent.concat(
-            "\n\n来自 [Vue版utry客户端](https://github.com/utryfe/bbc)"
+            "\n\n来自 [Vue版CNode客户端](https://reviving-pain.github.io/dist/#/cnodeCommunity/cnodejsTopics)"
           );
           var topicId = this.$route.path.split("/").pop();
           this.$apiRequest.createComment(
@@ -386,7 +386,7 @@ export default {
       }
     },
     // 打开or关闭文章编辑组件
-    editController(controlType) {
+    editController: function(controlType) {
       if (controlType === "edit") {
         console.log("准备打开编辑组件");
         this.$commonUtil.exchangePageTitle(this.article.title, "editArticle");
@@ -402,7 +402,7 @@ export default {
       }
     },
     // 锚点定位
-    anchorPosition(position) {
+    anchorPosition: function(position) {
       if (position === "comments") {
         this.$commonUtil.smoothScroll(
           this.$refs.comments.offsetTop,
@@ -418,59 +418,71 @@ export default {
     }
   },
   computed: {
-    loginStatus() {
+    loginStatus: function() {
       return this.$store.state.loginStatus;
     }
   },
   watch: {
-    loginStatus() {
+    loginStatus: function() {
       // 登录状态变化时刷新文章组件
       this.$parent.reload();
     }
   },
-  created() {
+  created: function() {
     // 获取文章详情(包括文章和评论)
     var articleId = this.$route.path.split("/")[3];
-    const res = topicDetail
-    this.article = res.data;
-    // 转换文章tab字段为汉字
-    for (let i = 0; i < topicTags.length; i++) {
-      if (topicTags[i].value === this.article.tab) {
-        this.articleTag = topicTags[i].name;
-        break;
+    this.$apiRequest.getTopicDetail(
+      articleId,
+      {
+        mdrender: "false",
+        loginname: this.$commonUtil.getCookie("loginname")
+      },
+      res => {
+        this.article = res.data.data;
+        // 转换文章tab字段为汉字
+        for (let i = 0; i < topicTags.length; i++) {
+          if (topicTags[i].value === this.article.tab) {
+            this.articleTag = topicTags[i].name;
+            break;
+          }
+        }
+        // 移动端显示时切除过长的用户名
+        if (this.$store.state.isMobile) {
+          this.newLoginname = this.$commonUtil.cutString(
+            this.article.author.loginname,
+            10
+          );
+        } else {
+          this.newLoginname = this.article.author.loginname;
+        }
+        // 转换评论的时间显示模式
+        for (let i = 0; i < this.article.replies.length; i++) {
+          this.article.replies[
+            i
+          ].create_at = this.$commonUtil.transformTimeInterval(
+            this.article.replies[i].create_at
+          );
+        }
+        // 更改页面标题
+        this.$commonUtil.exchangePageTitle(this.article.title, "article");
+        this.loading = false;
+        this.displayArticleContent = true;
+        if (this.loginStatus) {
+          if (res.data.data.is_collect) {
+            this.collect = "取消收藏";
+            this.collectBtnActive = true;
+          }
+        } else {
+          console.log(
+            "当前不在登录状态，无法发表评论，无法获取文章收藏与点赞状态，也无法判断是否可编辑"
+          );
+        }
+      },
+      err => {
+        this.$commonUtil.netErrorTips(err);
+        this.$router.push({ path: "/cnodeCommunity/cnodejsTopics" });
       }
-    }
-    // 移动端显示时切除过长的用户名
-    if (this.$store.state.isMobile) {
-      this.newLoginname = this.$commonUtil.cutString(
-        this.article.author.loginname,
-        10
-      );
-    } else {
-      this.newLoginname = this.article.author.loginname;
-    }
-    // 转换评论的时间显示模式
-    for (let i = 0; i < this.article.replies.length; i++) {
-      this.article.replies[
-        i
-        ].create_at = this.$commonUtil.transformTimeInterval(
-        this.article.replies[i].create_at
-      );
-    }
-    // 更改页面标题
-    this.$commonUtil.exchangePageTitle(this.article.title, "article");
-    this.loading = false;
-    this.displayArticleContent = true;
-    if (this.loginStatus) {
-      if (res.data.is_collect) {
-        this.collect = "取消收藏";
-        this.collectBtnActive = true;
-      }
-    } else {
-      console.log(
-        "当前不在登录状态，无法发表评论，无法获取文章收藏与点赞状态，也无法判断是否可编辑"
-      );
-    }
+    );
     // 解析当前url，替换文章与评论中出现的@用户链接
     var tempUrlPart = window.location.href;
     if (RegExp(/localhost:/).test(tempUrlPart)) {
