@@ -146,14 +146,13 @@ export default {
   },
 
   created() {
-    this.$store.commit("openLoginCard", true);
-    // 验证是否有存储
-    if (this.$commonUtil.getCookie("loginname")) {
-      sessionStorage["isAutoLogin"] = "true";
-      this.loading = true;
-      this.verifyLogin();
+    // 验证是否有token存储
+    if (this.$commonUtil.getCookie('loginname')) {
+      sessionStorage['isAutoLogin'] = 'true'
+      this.loading = true
+      this.verifyLogin()
     } else {
-      this.$store.commit("openLoginCard", true);
+      this.$store.commit('openLoginCard', true)
     }
   },
 

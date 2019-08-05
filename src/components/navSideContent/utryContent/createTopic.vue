@@ -106,8 +106,6 @@ export default {
         topicTitle: "",
         topicContent: ""
       },
-      // 存储添加推广链接后的文章内容(补全推广链接的时候直接出现在文本框中体验不好,所以添加此字段)
-      newTopicContent: "",
       // 选择显示哪一种提交按钮
       isModify: false,
       // url输入https补全
@@ -117,7 +115,7 @@ export default {
   },
   methods: {
     // 发布文章or修改文章(根据传入参数判断是发布文章还是修改文章)
-    publishTopic: function(publishType) {
+    publishTopic(publishType) {
       if (!(this.publishData.topicTag === "default_select")) {
         if (this.publishData.topicTitle) {
           // 正则验证，标题字数10~50字之间
@@ -133,16 +131,6 @@ export default {
               if (publishType === "newPublish") {
                 if (confirm("确认发布？")) {
                   this.subLoading = true;
-                  // 给发布的文章内容末尾添加推广链接
-                  if (
-                    !RegExp(/娇羞的Utry社区处女作客户端/).test(
-                      this.publishData.topicContent
-                    )
-                  ) {
-                    this.newTopicContent = this.publishData.topicContent.concat(
-                      "\n\n由 [vue版Utry客户端](https://github.com/utryfe/bbc) 独家发布"
-                    );
-                  }
                   this.createTopic();
                 } else {
                   console.log("发布已取消");
@@ -171,13 +159,13 @@ export default {
       }
     },
     // 新文章发布请求与相关逻辑
-    createTopic: function() {
+    createTopic() {
       this.$apiRequest.createTopic(
         {
           loginname: this.$commonUtil.getCookie("loginname"),
           title: this.publishData.topicTitle,
           tab: this.publishData.topicTag,
-          content: this.newTopicContent
+          content: this.publishData.topicContent
         },
         res => {
           this.subLoading = false;
@@ -197,7 +185,7 @@ export default {
       );
     },
     // 修改好的文章提交请求与相关逻辑
-    modifyTopic: function() {
+    modifyTopic() {
       var topicId = this.$route.path.split("/").pop();
       this.$apiRequest.modifyTopic(
         {
@@ -208,7 +196,7 @@ export default {
           content: this.publishData.topicContent
         },
         res => {
-          console.log(res);
+          console.log(res.data);
           this.subLoading = false;
           this.$parent.$parent.reload();
         },
@@ -219,7 +207,7 @@ export default {
         }
       );
     },
-    switchCard: function(type) {
+    switchCard(type) {
       if (type === "edit") {
         this.isPreview = false;
       } else if (type === "preview") {
@@ -227,7 +215,7 @@ export default {
       }
     }
   },
-  created: function() {
+  created() {
     // 更改页面标题
     if (this.$route.path.split("/").pop() === "createTopic") {
       this.$commonUtil.exchangePageTitle("在utry前端社区发布话题");

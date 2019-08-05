@@ -14,14 +14,38 @@
 
 <script>
 export default {
-  data: function() {
+  data() {
     return {
       isRouterAlive: true,
       pageShouldLogin: ["createTopic", "profile", "messages"]
     };
   },
-  mounted() {
-    this.$router.push({ path: "/utryCommunity/utryjsTopics" });
+  computed: {
+    loginStatus() {
+      return this.$store.state.loginStatus;
+    }
+  },
+  watch: {
+    loginStatus() {
+      if (!this.loginStatus) {
+        let shouldLogin =
+          this.pageShouldLogin.indexOf(this.$route.path.split("/").pop()) + 1;
+        if (shouldLogin) {
+          this.$router.push({ path: "/utryCommunity/utryjsTopics" });
+          this.$store.commit("openLoginCard", true);
+        }
+      }
+    }
+  },
+
+  methods: {
+    // 重新加载子组件
+    reload() {
+      this.isRouterAlive = false;
+      this.$nextTick(() => {
+        this.isRouterAlive = true;
+      });
+    }
   }
 };
 </script>

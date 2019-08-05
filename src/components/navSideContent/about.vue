@@ -13,7 +13,7 @@
 
     [[---github源码---]](https://github.com/utryfe/bbc)
     ## 技术栈
-    - 前端框架：`vue@cli3 & Vue全家桶`
+    - 前端框架：`vue@cli3 & Vue全家桶 & Axios & vue-router`
     - 后端框架：`Express + Node`
     - 数据存储：`MongoDB + Redis`
     - 样式控制: `font-awesome/vue-markdown`

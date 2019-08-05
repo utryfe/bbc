@@ -102,7 +102,7 @@ export default {
       this.hidemenu();
       switch (e.target.id) {
         case "login":
-          this.$store.commit("openLoginCard", true);
+          this.$store.commit('openLoginCard', true);
           break;
         case "userCenter":
           if (this.$route.path !== "/utryCommunity/profile") {
@@ -129,8 +129,15 @@ export default {
     },
 
     // 加载用户消息列表
-    loadMsgPage() {
-      alert("您尚未登陆，请先登录");
+    loadMsgPage: function () {
+      if (this.$store.state.loginStatus) {
+        if (this.$route.path !== '/utryCommunity/messages') {
+          this.$router.push({path: '/urtyCommunity/messages'})
+        }
+      } else {
+        alert('您尚未登陆，请先登录')
+        this.$store.commit('openLoginCard', true)
+      }
     }
   },
 

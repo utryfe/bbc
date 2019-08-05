@@ -83,9 +83,9 @@ export default {
         this.$router.push({ path: tabPath + subTabPath });
       } else {
         if (shouldLogin) {
-          this.$store.commit("openLoginCard", true);
+          this.$store.commit('openLoginCard', true);
           // 先提示需要登录，然后记录当前点的菜单，如果用用户登录了，则转回来
-          // alert("您尚未登陆，请先登录");
+          alert("您尚未登陆，请先登录");
           this.$router.push({ path: tabPath + subTabPath });
         } else {
           this.$router.push({ path: tabPath + subTabPath });

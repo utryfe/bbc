@@ -247,7 +247,6 @@ export default {
       collect: "收藏",
       collectBtnActive: false,
       commentContent: "",
-      newCommentContent: "",
       newLoginname: "",
       loading: true,
       subLoading: {
@@ -278,7 +277,7 @@ export default {
         this.$apiRequest.commentLike(
           replyId,
           {
-            accesstoken: this.$commonUtil.getCookie("accesstoken")
+            loginname: this.$commonUtil.getCookie("loginname")
           },
           res => {
             if (res.data.action === "up") {
@@ -343,11 +342,11 @@ export default {
         }
       } else {
         alert("要添加收藏请先登录");
-        this.$store.commit("openLoginCard", true);
+        this.$store.commit('openLoginCard', true);
       }
     },
     // 发表评论
-    publishComment: function(e) {
+    publishComment(e) {
       // enter+ctrl组合键 或者 点击发表评论按钮
       if ((e.code === "Enter" && e.ctrlKey === true) || !e.code) {
         if (this.commentContent === "") {
@@ -359,16 +358,12 @@ export default {
             "](www",
             "](https://www"
           );
-          // 给评论末尾添加推广链接
-          this.newCommentContent = this.commentContent.concat(
-            "\n\n来自 [Vue版CNode客户端](https://reviving-pain.github.io/dist/#/cnodeCommunity/cnodejsTopics)"
-          );
           var topicId = this.$route.path.split("/").pop();
           this.$apiRequest.createComment(
             topicId,
             {
-              accesstoken: this.$commonUtil.getCookie("accesstoken"),
-              content: this.newCommentContent
+              loginname: this.$commonUtil.getCookie("loginname"),
+              content: this.commentContent
             },
             res => {
               this.subLoading.commentLoading = false;
@@ -386,7 +381,7 @@ export default {
       }
     },
     // 打开or关闭文章编辑组件
-    editController: function(controlType) {
+    editController(controlType) {
       if (controlType === "edit") {
         console.log("准备打开编辑组件");
         this.$commonUtil.exchangePageTitle(this.article.title, "editArticle");

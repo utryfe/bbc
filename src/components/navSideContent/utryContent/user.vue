@@ -80,7 +80,7 @@
           >
             <img :src="item.author.avatar_url" :title="item.author.loginname" />
             <router-link
-              :to="{ name: 'ArticleRoute', params: { id: item.id } }"
+              :to="{ name: 'ArticleRoute', params: { id: item._id } }"
             >
               <span>{{ item.title }}</span>
             </router-link>
