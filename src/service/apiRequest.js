@@ -103,8 +103,8 @@ export default {
   getTopicDetail: function(articleId, params, resolve, reject) {
     http.ajaxRequest("topic/" + articleId, "get", params, {}, resolve, reject);
   },
-  // 【文章】获取CNode首页文章列表
-  getCnodeTopics: function(params, resolve, reject) {
+  // 【文章】获取uTry前端首页文章列表
+  getUtryTopics: function(params, resolve, reject) {
     http.ajaxRequest("/topics", "get", params, {}, resolve, reject);
   }
 };

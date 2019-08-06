@@ -181,8 +181,8 @@ export default {
       );
     },
     requestUserInfo(userName) {
-      this.getUserInfo(userName);
-      this.getUserCollectedTopic(userName); // 查询用户收藏的文章
+      this.getUserInfo(userName); // 获取用户信息
+      this.getUserCollectedTopic(userName); // 获取用户收藏的文章
     }
   },
   computed: {

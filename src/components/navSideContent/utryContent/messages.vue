@@ -87,7 +87,7 @@ export default {
   components: {
     loading: loading
   },
-  data: function() {
+  data() {
     return {
       loading: false,
       msgData: {
@@ -138,7 +138,7 @@ export default {
           this.loading = true;
           this.$apiRequest.markAllMsgToRead(
             {
-              loginname: this.$commonUtil.getCookie("loginname")
+              accesstoken: this.$commonUtil.getCookie("accesstoken")
             },
             res => {
               alert("操作成功");
@@ -180,7 +180,7 @@ export default {
       this.$apiRequest.markOneMsgToRead(
         this.msgData.hasnotReadMsgs[msgIndex].id,
         {
-          loginname: this.$commonUtil.getCookie("loginname")
+          accesstoken: this.$commonUtil.getCookie("accesstoken")
         },
         res => {
           // 调用header的消息数量请求，刷新数量显示
@@ -200,7 +200,7 @@ export default {
   watch: {
     loginStatus() {
       if (!this.loginStatus) {
-        this.$router.push({ path: "/cnodeCommunity/cnodejsTopics" });
+        this.$router.push({ path: "/utryCommunity/utryjsTopics" });
       }
     }
   },
@@ -222,7 +222,7 @@ export default {
       },
       err => {
         this.$commonUtil.netErrorTips(err);
-        this.$router.push({ path: "/cnodeCommunity/cnodejsTopics" });
+        this.$router.push({ path: "/utryCommunity/utryjsTopics" });
       }
     );
   }

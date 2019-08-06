@@ -40,7 +40,7 @@
     </div>
     <!-- 头像展开菜单遮罩层 -->
     <div @click="hidemenu" v-show="showMenuMask" class="avataMenuMask"></div>
-    <!-- 社区消息提醒 -->
+    <!-- CNode社区消息提醒 -->
     <div @click="loadMsgPage" class="messageTipsWrp" title="我的消息">
       <span v-if="hasMsg" class="tipsNum">{{ msgNum }}</span>
       <span v-if="hasMsg" class="fa fa-envelope"></span>
@@ -52,7 +52,7 @@
 
 <script>
 export default {
-  data: function() {
+  data() {
     return {
       showAvatarMenu: false,
       showMenuMask: false,
@@ -60,32 +60,6 @@ export default {
       msgNum: 0
     };
   },
-
-  computed: {
-    // 获取登录状态
-    loginStatus: function() {
-      return this.$store.state.loginStatus;
-    }
-  },
-
-  watch: {
-    loginStatus: function() {
-      if (this.loginStatus) {
-        // 当取得登录状态后先获取一次消息数量
-        // this.getUserMsgNum();
-        // 挂载定时请求方法,定时接收消息
-        this.timer = setInterval(() => {
-          // 每1分钟请求一次
-          // this.getUserMsgNum();
-        }, 60000);
-      } else {
-        // 当失去登录状态时清除请求计时器，同时清除消息提示
-        clearInterval(this.timer);
-        this.hasMsg = false;
-      }
-    }
-  },
-
   methods: {
     mobileSidebarController() {
       this.$store.commit("navSideController", !this.$store.state.showNavside);
@@ -102,9 +76,11 @@ export default {
       this.hidemenu();
       switch (e.target.id) {
         case "login":
-          this.$store.commit('openLoginCard', true);
+          console.log("打开登录窗口");
+          this.$store.commit("openLoginCard", true);
           break;
         case "userCenter":
+          console.log("前往个人中心");
           if (this.$route.path !== "/utryCommunity/profile") {
             this.$router.push({ path: "/utryCommunity/profile" });
           }
@@ -112,6 +88,7 @@ export default {
         case "logout":
           var logout = confirm("确认要注销登录吗？");
           if (logout === true) {
+            console.log("执行注销登陆");
             this.$store.commit("changeLoginStatus", {
               success: false
             });
@@ -122,26 +99,71 @@ export default {
             }
             alert("您已注销登录");
           } else {
-            alert("注销登陆操作已取消");
+            console.log("注销登陆操作已取消");
           }
           break;
       }
     },
-
+    // 获取用户未读消息数量
+    getUserMsgNum() {
+      this.$apiRequest.getUserMsgNum(
+        {
+          loginname: this.$commonUtil.getCookie("loginname")
+        },
+        res => {
+          if (res.data.data > 9) {
+            this.msgNum = "9+";
+          } else {
+            this.msgNum = res.data.data;
+          }
+          if (this.msgNum) {
+            this.hasMsg = true;
+          } else {
+            this.hasMsg = false;
+          }
+        },
+        err => {
+          console.log(err.response.data.error_msg);
+          this.$parent.verifyToken();
+        }
+      );
+    },
     // 加载用户消息列表
-    loadMsgPage: function () {
+    loadMsgPage() {
       if (this.$store.state.loginStatus) {
-        if (this.$route.path !== '/utryCommunity/messages') {
-          this.$router.push({path: '/urtyCommunity/messages'})
+        if (this.$route.path !== "/utryCommunity/messages") {
+          this.$router.push({ path: "/utryCommunity/messages" });
         }
       } else {
-        alert('您尚未登陆，请先登录')
-        this.$store.commit('openLoginCard', true)
+        alert("您尚未登陆，请先登录");
+        this.$store.commit("openLoginCard", true);
       }
     }
   },
-
-  beforeDestroy: function() {
+  computed: {
+    // 获取登录状态
+    loginStatus() {
+      return this.$store.state.loginStatus;
+    }
+  },
+  watch: {
+    loginStatus() {
+      if (this.loginStatus) {
+        // 当取得登录状态后先获取一次消息数量
+        this.getUserMsgNum();
+        // 挂载定时请求方法,定时接收消息
+        this.timer = setInterval(() => {
+          // 每1分钟请求一次
+          this.getUserMsgNum();
+        }, 60000);
+      } else {
+        // 当失去登录状态时清除请求计时器，同时清除消息提示
+        clearInterval(this.timer);
+        this.hasMsg = false;
+      }
+    }
+  },
+  beforeDestroy() {
     // 在实例销毁之前清除请求计时器
     clearInterval(this.timer);
   }
@@ -152,7 +174,7 @@ export default {
 .header {
   height: 100%;
   width: 100%;
-  background: #0aa344;
+  background: #2a303c;
 }
 
 /* header头像的样式 */

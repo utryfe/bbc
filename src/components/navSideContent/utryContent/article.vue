@@ -162,6 +162,7 @@
             ></vue-markdown>
             <div>
               <span class="tip-text float-l">{{ comment.create_at }}</span>
+              <!-- 点赞按钮 -->
               <button
                 :disabled="subLoading.likeLoading"
                 @click="likeController(index)"
@@ -263,7 +264,7 @@ export default {
   methods: {
     // 给评论点赞与取消点赞
     likeController: function(replyIndex) {
-      var replyId = this.article.replies[replyIndex].id;
+      var replyId = this.article.replies[replyIndex]._id;
       if (!this.loginStatus) {
         alert("需要登录");
       } else if (
@@ -475,7 +476,7 @@ export default {
       },
       err => {
         this.$commonUtil.netErrorTips(err);
-        this.$router.push({ path: "/cnodeCommunity/cnodejsTopics" });
+        this.$router.push({ path: "/utryCommunity/utryjsTopics" });
       }
     );
     // 解析当前url，替换文章与评论中出现的@用户链接

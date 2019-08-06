@@ -24,7 +24,7 @@
     <!-- 整体文章列表 -->
     <div class="nsc-commonBody cnodeTopicsBody">
       <!-- 文章条目 -->
-      <div v-for="item of content" :key="item.id" class="topicItem a-link-b">
+      <div v-for="item of content" :key="item._id" class="topicItem a-link-b">
         <router-link
           :to="{ name: 'UserRoute', params: { name: item.author.loginname } }"
           tag="div"
@@ -33,7 +33,7 @@
           <img :src="item.author.avatar_url" :title="item.author.loginname" />
         </router-link>
         <div class="topicItemTextInfo">
-          <router-link :to="{ name: 'ArticleRoute', params: { id: item.id } }">
+          <router-link :to="{ name: 'ArticleRoute', params: { id: item._id } }">
             <div v-if="item.top" class="mark-tag bgc-wineRed">置顶</div>
             {{ item.title }}
           </router-link>
@@ -62,13 +62,14 @@
 </template>
 
 <script>
-import { topicTabs, topicContent } from "../../../data/topicClassify";
-import loading from "../../../components/common/loading";
+import { topicTabs } from "../../../data/topicClassify.js";
+import loading from "../../common/loading.vue";
+
 export default {
-  name: "MainSection",
   components: {
     loading: loading
   },
+  name: "MainSection",
   data() {
     return {
       content: [],
@@ -127,24 +128,38 @@ export default {
     },
     // 发送接口请求，获取返回数据
     getData(currentTab, type) {
-      const res = topicContent;
-      // 日期转换
-      for (let i = 0; i < res.data.length; i++) {
-        res.data[i].create_at = this.$commonUtil.transformTimeInterval(
-          res.data[i].create_at
-        );
-      }
-      // 如果是切换tab选项卡操作则将页面拉到顶部
-      if (type === "switch") {
-        this.$refs.cnodeTopics.scrollTop = 0;
-      }
-      this.content = res.data;
-      this.loading = false;
-      this.loadingBlock = false;
-      // 请求成功后，稍等0.5秒释放按钮disabled(预防出现刚请求完成时点击过快而内容不切换的问题)
-      setTimeout(() => {
-        this.isTabBarActive = true;
-      }, 500);
+      this.limit += 3;
+      // 开始请求cnode社区主页数据
+      this.$apiRequest.getUtryTopics(
+        {
+          page: 1,
+          limit: this.limit,
+          tab: currentTab
+        },
+        res => {
+          // 日期转换
+          for (let i = 0; i < res.data.data.length; i++) {
+            res.data.data[i].create_at = this.$commonUtil.transformTimeInterval(
+              res.data.data[i].create_at
+            );
+          }
+          // 如果是切换tab选项卡操作则将页面拉到顶部
+          if (type === "switch") {
+            this.$refs.cnodeTopics.scrollTop = 0;
+          }
+          this.content = res.data.data;
+          this.loading = false;
+          this.loadingBlock = false;
+          // 请求成功后，稍等0.5秒释放按钮disabled(预防出现刚请求完成时点击过快而内容不切换的问题)
+          setTimeout(() => {
+            this.isTabBarActive = true;
+          }, 500);
+        },
+        err => {
+          this.$commonUtil.netErrorTips(err);
+          this.isTabBarActive = true;
+        }
+      );
     },
     // 将滚动条拉到顶部
     backToTop() {
@@ -169,12 +184,29 @@ export default {
   },
   created() {
     this.loading = true;
+    // 初次或重新加载的时候回填上次选择的tab分类标签
+    if (!sessionStorage["currentTab"]) {
+      sessionStorage["currentTab"] = this.currentTab;
+    } else {
+      this.currentTab = sessionStorage["currentTab"];
+    }
     this.getData(this.currentTab);
-    setTimeout(() => (this.loading = false), 2000);
   },
   mounted() {
     // loadingBlock出现的时候停用监控(第三个参数设置为false[冒泡时执行]时,监听停止)
     window.addEventListener("scroll", this.scrollMethod, !this.loadingBlock);
+  },
+  beforeRouteLeave(to, from, next) {
+    // 切换路由时更新滚动条浏览位置的数据
+    sessionStorage["scrollPosition"] = this.$refs.cnodeTopics.scrollTop;
+    next();
+  },
+  beforeRouteEnter(to, from, next) {
+    // 切换至其他路由又切回来时还原上次的浏览位置(beforeRoutEnter无法直接拿到this)
+    next(vm => {
+      vm.$commonUtil.exchangePageTitle("utry前端社区主页");
+      vm.$refs.cnodeTopics.scrollTop = sessionStorage["scrollPosition"];
+    });
   }
 };
 </script>
