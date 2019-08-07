@@ -91,7 +91,7 @@
             <textarea
               @keyup.enter="publishComment"
               class="commentArea"
-              placeholder="写下你的评论…(支持markdown语法，请不要在非测试话题里发表测试评论，后果自负)"
+              placeholder="写下你的评论…(支持markdown语法)"
               v-model.trim="commentContent"
             ></textarea>
             <span v-if="!$store.state.isMobile" class="tip-text"

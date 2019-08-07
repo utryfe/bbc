@@ -138,7 +138,7 @@ export default {
           this.loading = true;
           this.$apiRequest.markAllMsgToRead(
             {
-              accesstoken: this.$commonUtil.getCookie("accesstoken")
+              loginname: this.$commonUtil.getCookie("loginname")
             },
             res => {
               alert("操作成功");
@@ -177,10 +177,11 @@ export default {
     },
     // 发送单条消息标记请求
     markOneMsgToRead(msgIndex) {
+      const msgId = this.msgData.hasnotReadMsgs[msgIndex]._id
       this.$apiRequest.markOneMsgToRead(
-        this.msgData.hasnotReadMsgs[msgIndex].id,
+        msgId,
         {
-          accesstoken: this.$commonUtil.getCookie("accesstoken")
+          loginname: this.$commonUtil.getCookie("loginname")
         },
         res => {
           // 调用header的消息数量请求，刷新数量显示

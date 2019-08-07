@@ -123,11 +123,20 @@ export default {
         },
         res => {
           this.loading = false;
-          if (usr) {
-            this.$commonUtil.setCookie("loginname", loginname, 0.5);
-            this.$commonUtil.setCookie("password", password, 0.5);
+          if(res.data.success) {
+            if (usr) {
+              this.$commonUtil.setCookie("loginname", loginname, 0.5);
+              this.$commonUtil.setCookie("password", password, 0.5);
+            }
+            this.$store.commit("changeLoginStatus", res.data);
+          } else {
+            this.$store.commit("changeLoginStatus", {
+              success: false
+            });
+            alert(res.data.msg)
+            // 重新加载一下登录组件
+            this.$children[2].reload();
           }
-          this.$store.commit("changeLoginStatus", res.data);
         },
         err => {
           this.$store.commit("changeLoginStatus", {
