@@ -13,7 +13,7 @@
           <span> 用户名：{{ userInfo.loginname }}</span
           ><br />
           <i class="fa fa-clock-o fa-fw"></i>
-          <span>注册时间：{{ userInfo.create_at.slice(0, 10) }}</span>
+          <span>注册时间：{{ userInfo.create_at.slice(0, 10) }}</span><br>
         </div>
       </div>
       <div class="nsc-commonBlockWrp">
@@ -130,6 +130,11 @@ export default {
     };
   },
   methods: {
+    // 更换用户头像
+    uploadAvatar(e) {
+      debugger
+      service.uploadAvatar(e.target.files[0]);
+    },
     showMoreContent(type) {
       if (type === "collect") {
         if (this.collectShowNum === 5) {

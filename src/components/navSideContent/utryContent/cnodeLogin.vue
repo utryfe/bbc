@@ -26,7 +26,7 @@
         <div v-show="loginTabActive">
           请输入你的昵称<br />
           <input
-            placeholder="借月色行凶"
+            placeholder="name"
             class="identityInfo"
             v-model.trim="userInfo.loginname"
             type="text"
@@ -35,7 +35,7 @@
           <br />
           请输入你的密码<br />
           <input
-            placeholder="......"
+            placeholder="password"
             class="identityInfo"
             v-model.trim="userInfo.password"
             type="password"
@@ -61,7 +61,7 @@
         <div v-show="registerTabActive">
           请输入你的昵称<br />
           <input
-            placeholder="小花"
+            placeholder="name"
             class="identityInfo"
             v-model.trim="userInfo.loginname"
             type="text"
@@ -70,11 +70,19 @@
           <br />
           请输入你的密码<br />
           <input
-            placeholder="......"
+            placeholder="password"
             class="identityInfo"
             v-model.trim="userInfo.password"
             type="password"
           />
+          <br />
+          <br />
+          请选择头像
+          <div class="imgAddress">
+            <span v-for="(img, index) in imgArr">
+              <img :src="img" :alt="index" @click="handleImg(img)">
+            </span>
+          </div>
           <!-- 注册提交按钮 -->
           <button
             :disabled="loading"
@@ -98,15 +106,29 @@
 <script>
 export default {
   data() {
+    const imgUrl = 'https://s2.ax1x.com/2019/08/12/'
     return {
       loginTabActive: true,
       registerTabActive: false,
       userInfo: {
         loginname: "",
-        password: ""
+        password: "",
+        avatar_url: "",
       },
       loading: false,
-      storeToekn: false
+      storeToekn: false,
+      imgArr: [
+        imgUrl+'exyvnO.jpg',
+        imgUrl+'exyXjK.jpg',
+        imgUrl+'exyOc6.jpg',
+        imgUrl+'ex4A00.jpg',
+        imgUrl+'ex4kmq.jpg',
+        imgUrl+'ex5fPO.jpg',
+        imgUrl+'ex5hGD.jpg',
+        imgUrl+'ex54Re.jpg',
+        imgUrl+'ex55xH.jpg',
+        imgUrl+'ex5oMd.jpg'
+      ]
     };
   },
   methods: {
@@ -118,7 +140,7 @@ export default {
     },
     registerTab() {
       // 重置
-      this.userInfo = { loginname: "", password: "" };
+      this.userInfo = { loginname: "", password: "", avatar_url: "" };
       this.loginTabActive = false;
       this.registerTabActive = true;
     },
@@ -126,8 +148,8 @@ export default {
       this.$store.commit("openLoginCard", false);
     },
     userRegister() {
-      const { loginname, password } = this.userInfo;
-      if (!loginname || !password) {
+      const { loginname, password, avatar_url } = this.userInfo;
+      if (!loginname || !password || !avatar_url) {
         alert("还有信息没有填哦");
       } else {
         this.loading = true;
@@ -144,6 +166,9 @@ export default {
         sessionStorage["isAutoLogin"] = "false";
         this.$root.$children[0].verifyLogin(this.userInfo);
       }
+    },
+    handleImg(url) {
+      this.userInfo.avatar_url = url
     }
   },
   computed: {
@@ -262,6 +287,20 @@ export default {
   color: #fff;
   font-size: 1.1rem;
   cursor: pointer;
+}
+
+.loginWrp .loginCard .loginCardBody .imgAddress {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  height: 120px;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.loginWrp .loginCard .loginCardBody .imgAddress img {
+  width: 64px;
+  height: 64px;
 }
 
 /* 响应式样式 */

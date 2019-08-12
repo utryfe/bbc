@@ -86,11 +86,12 @@ export default {
     },
     // 注册
     verifyRegister(usr) {
-      const { loginname, password } = usr;
+      const { loginname, password, avatar_url } = usr;
       this.$apiRequest.registerUsers(
         {
           loginname,
-          password
+          password,
+          avatar_url
         },
         res => {
           this.loading = false;

@@ -106,5 +106,13 @@ export default {
   // 【文章】获取uTry前端首页文章列表
   getUtryTopics: function(params, resolve, reject) {
     http.ajaxRequest("/topics", "get", params, {}, resolve, reject);
+  },
+
+  // 【用户】更换用户头像
+  uploadAvatar(avatar, params, resolve, reject) {
+    // headers: { 'content-type': 'multipart/form-data' }
+    let data = new FormData();
+    data.append('avatar', avatar);
+    http.ajaxRequest("/upload-avatar", "get", params, {}, resolve, reject);
   }
 };
