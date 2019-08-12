@@ -80,7 +80,7 @@
           请选择头像
           <div class="imgAddress">
             <span v-for="(img, index) in imgArr">
-              <img :src="img" :alt="index" @click="handleImg(img)">
+              <img :src="img" :alt="index" @click="handleImg(img,index)">
             </span>
           </div>
           <!-- 注册提交按钮 -->
@@ -118,6 +118,12 @@ export default {
       loading: false,
       storeToekn: false,
       imgArr: [
+        imgUrl+'ex55xH.jpg',
+        imgUrl+'ex5oMd.jpg',
+        imgUrl+'ezyFbD.jpg',
+        imgUrl+'ezyiDO.jpg',
+        imgUrl+'ezy9v6.jpg',
+        imgUrl+'ezypgx.jpg',
         imgUrl+'exyvnO.jpg',
         imgUrl+'exyXjK.jpg',
         imgUrl+'exyOc6.jpg',
@@ -126,9 +132,30 @@ export default {
         imgUrl+'ex5fPO.jpg',
         imgUrl+'ex5hGD.jpg',
         imgUrl+'ex54Re.jpg',
-        imgUrl+'ex55xH.jpg',
-        imgUrl+'ex5oMd.jpg'
-      ]
+        imgUrl+'ezyS81.jpg',
+        imgUrl+'ezyAVe.jpg',
+        imgUrl+'ezyV5d.jpg',
+        imgUrl+'ezyePA.jpg',
+        imgUrl+'ezym8I.jpg',
+        imgUrl+'ezyn2t.jpg',
+        imgUrl+'ezyMKf.jpg',
+        imgUrl+'ezyQr8.jpg',
+        imgUrl+'ezylqS.jpg',
+        imgUrl+'ezy3Vg.jpg',
+        imgUrl+'ezy8aQ.jpg',
+        imgUrl+'ezyG5j.jpg',
+        imgUrl+'ezyYPs.jpg',
+        imgUrl+'ezytGn.jpg',
+        imgUrl+'ezyN2q.jpg',
+        imgUrl+'ezyUx0.jpg',
+        imgUrl+'ezclNQ.jpg',
+        imgUrl+'ezcQAg.jpg',
+        imgUrl+'ezc1hj.jpg',
+        imgUrl+'ez5tTx.jpg',
+        imgUrl+'ez5Y01.jpg',
+        imgUrl+'ez5JmR.jpg'
+      ],
+      beforeIndex: 88,
     };
   },
   methods: {
@@ -167,8 +194,18 @@ export default {
         this.$root.$children[0].verifyLogin(this.userInfo);
       }
     },
-    handleImg(url) {
+    handleImg(url, index) {
+      const oldIndex = this.beforeIndex
+      if(this.userInfo.avatar_url && oldIndex === index) {
+        document.getElementsByTagName('img')[oldIndex].classList.remove('img-border')
+        this.userInfo.avatar_url = ""
+        return
+      } else if (this.userInfo.avatar_url) {
+        document.getElementsByTagName('img')[oldIndex].classList.remove('img-border')
+      }
+      document.getElementsByTagName('img')[index].classList.add('img-border')
       this.userInfo.avatar_url = url
+      this.beforeIndex = index
     }
   },
   computed: {
@@ -301,6 +338,10 @@ export default {
 .loginWrp .loginCard .loginCardBody .imgAddress img {
   width: 64px;
   height: 64px;
+}
+
+.img-border {
+  border: 5px solid #0a0c0a;
 }
 
 /* 响应式样式 */
